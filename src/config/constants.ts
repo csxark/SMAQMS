@@ -14,8 +14,18 @@ export const DEMO_ACCOUNTS = [
   },
   {
     role: "Doctor",
+    name: "Dr. Neha Kapoor (Pediatrician)",
+    email: "neha.kapoor@example.com",
+  },
+  {
+    role: "Doctor",
     name: "Dr. Rohan Iyer (Cardiologist)",
     email: "rohan.iyer@example.com",
+  },
+  {
+    role: "Doctor",
+    name: "Dr. Shalini Verma (Dermatologist)",
+    email: "shalini.verma@example.com",
   },
   {
     role: "Doctor",
@@ -23,43 +33,9 @@ export const DEMO_ACCOUNTS = [
     email: "rajesh.kulkarni@example.com",
   },
   {
-    role: "Doctor",
-    name: "Dr. Tanvi Bhatia (Pulmonologist)",
-    email: "tanvi.bhatia@example.com",
-  },
-  {
     role: "Receptionist",
     name: "Priya Sharma",
     email: "priya.sharma@example.com",
   },
-  {
-    role: "Receptionist",
-    name: "Amit Trivedi",
-    email: "amit.trivedi@example.com",
-  },
-  {
-    role: "Receptionist",
-    name: "Sunita Rao",
-    email: "sunita.rao@example.com",
-  },
-  {
-    role: "Patient",
-    name: "Ananya Rao (Completed Visit & Future Booking)",
-    email: "ananya.rao@example.com",
-  },
-  {
-    role: "Patient",
-    name: "Kabir Das (In Consultation Now)",
-    email: "kabir.das@example.com",
-  },
-  {
-    role: "Patient",
-    name: "Meera Nair (Waiting in Live Queue)",
-    email: "meera.nair@example.com",
-  },
-  {
-    role: "Patient",
-    name: "Vikram Singh (Consultation Completed Today)",
-    email: "vikram.singh@example.com",
-  },
 ] as const;
+

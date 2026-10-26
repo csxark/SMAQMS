@@ -14,6 +14,7 @@ import { FieldError } from "@/shared/ui";
 import { friendlyError } from "@/shared/errors";
 import { fetchRole, ROLE_HOME } from "@/auth/auth";
 import { DEMO_ACCOUNTS, DEMO_PASSWORD, SHOW_DEMO_CREDENTIALS } from "@/config/constants";
+import { Badge } from "@/components/ui/badge";
 import { AuthCard } from "@/shared/AuthCard";
 
 export const Route = createFileRoute("/login")({
@@ -76,23 +77,35 @@ function LoginPage() {
       {SHOW_DEMO_CREDENTIALS && (
         <div className="mt-6 rounded-xl border bg-muted/50">
           <Button variant="ghost" type="button" onClick={() => setOpen((o) => !o)} className="h-auto w-full justify-between px-4 py-3 text-sm font-semibold text-foreground">
-            Demo accounts <ChevronDown className={`size-4 transition-transform ${open ? "rotate-180" : ""}`} />
+            <span>Demo accounts <span className="ml-1 text-xs font-normal text-muted-foreground">(Staff)</span></span>
+            <ChevronDown className={`size-4 transition-transform ${open ? "rotate-180" : ""}`} />
           </Button>
           {open && (
-            <div className="space-y-1 px-2 pb-3">
-              <p className="px-2 pb-1 text-xs text-muted-foreground">Password for all: <code className="font-semibold text-foreground">{DEMO_PASSWORD}</code></p>
+            <div className="space-y-1.5 px-3 pb-3">
+              <p className="px-1 pb-1 text-xs text-muted-foreground">
+                Password for all staff: <code className="rounded bg-background px-1.5 py-0.5 font-semibold text-foreground border">{DEMO_PASSWORD}</code>
+              </p>
               {DEMO_ACCOUNTS.map((a) => (
                 <Button
                   variant="ghost"
                   key={a.email}
                   type="button"
                   onClick={() => { setValue("email", a.email); setValue("password", DEMO_PASSWORD); }}
-                  className="h-auto w-full justify-between rounded-md px-2 py-2 text-left text-sm hover:bg-card"
+                  className="h-auto w-full items-center justify-between rounded-md border border-transparent px-2.5 py-2 text-left text-sm hover:border-border hover:bg-card"
                 >
-                  <span className="text-foreground">{a.name}</span>
-                  <span className="text-xs text-muted-foreground">{a.role}</span>
+                  <span className="font-medium text-foreground">{a.name}</span>
+                  <Badge variant={a.role === "Doctor" ? "default" : "secondary"} className="text-[11px] font-normal">
+                    {a.role}
+                  </Badge>
                 </Button>
               ))}
+              <div className="mt-2 rounded-lg border border-dashed border-border/80 bg-background/60 p-2.5 text-xs text-muted-foreground">
+                <span className="font-semibold text-foreground">Patients:</span> No demo logins — patients must{" "}
+                <Link to="/register" className="font-semibold text-primary underline underline-offset-2">
+                  create an account
+                </Link>{" "}
+                to book & track appointments.
+              </div>
             </div>
           )}
         </div>
