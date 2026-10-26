@@ -1,0 +1,48 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1792782346926,
+      "tag": "0000_clinic_schema",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792782393164,
+      "tag": "0001_clinic_rpcs",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792782424786,
+      "tag": "0002_clinic_seed_demo_data",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792786328220,
+      "tag": "0003_receptionist_start_consultation",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792786461736,
+      "tag": "0004_keep_position_while_in_consultation",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793014549701,
+      "tag": "0005_public_queue_board",
+      "breakpoints": true
+    }
+  ]
+}
