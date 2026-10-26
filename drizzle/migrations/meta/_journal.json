@@ -43,6 +43,13 @@
       "when": 1793014549701,
       "tag": "0005_public_queue_board",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793100000000,
+      "tag": "0006_reset_and_seed_comprehensive_data",
+      "breakpoints": true
     }
   ]
 }
