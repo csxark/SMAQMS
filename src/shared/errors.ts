@@ -24,5 +24,11 @@ export function friendlyError(e: unknown): string {
   if (match) return FRIENDLY[match[1] ?? ""] ?? match[2] ?? msg;
   if (/Invalid login credentials/i.test(msg)) return "Incorrect email or password.";
   if (/already registered/i.test(msg)) return "An account with this email already exists.";
+  if (/over_email_send_rate_limit|email rate limit/i.test(msg))
+    return "Email rate limit reached for testing. Please try again later or contact support.";
+  if (/rate limit|too many requests|429/i.test(msg))
+    return "Too many requests. Please wait a moment before trying again.";
+  if (/email not confirmed/i.test(msg))
+    return "Please check your inbox and verify your email before logging in.";
   return msg || "Something went wrong.";
 }
