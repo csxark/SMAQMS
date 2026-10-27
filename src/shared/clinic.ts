@@ -38,4 +38,12 @@ export function formatTime(t: string): string {
   return `${hh}:${String(m).padStart(2, "0")} ${suffix}`;
 }
 
-export const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+export const DAY_NAMES = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];

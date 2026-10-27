@@ -45,12 +45,25 @@ function RegisterPage() {
   });
 
   const onSubmit = async (v: Out) => {
-    const { error } = await supabase.auth.signUp({
-      email: v.email,
+    const email = v.email.trim().toLowerCase();
+    const { data, error } = await supabase.auth.signUp({
+      email,
       password: v.password,
-      options: { data: { name: v.name, phone: v.phone } },
+      options: { data: { name: v.name.trim(), phone: v.phone.trim() } },
     });
     if (error) return void toast.error(friendlyError(error));
+
+    if (!data.session) {
+      const { data: signData, error: signInErr } = await supabase.auth.signInWithPassword({
+        email,
+        password: v.password,
+      });
+      if (signInErr || !signData.session) {
+        toast.info("Account created! Please log in.");
+        return void window.location.assign("/login");
+      }
+    }
+    toast.success("Account created successfully!");
     window.location.assign("/patient/doctors");
   };
 

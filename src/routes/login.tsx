@@ -19,7 +19,10 @@ import { AuthCard } from "@/shared/AuthCard";
 
 export const Route = createFileRoute("/login")({
   validateSearch: (s: Record<string, unknown>) => ({
-    redirect: typeof s["redirect"] === "string" && s["redirect"].startsWith("/") ? s["redirect"] : undefined,
+    redirect:
+      typeof s["redirect"] === "string" && s["redirect"].startsWith("/")
+        ? s["redirect"]
+        : undefined,
   }),
   head: () => ({
     meta: [
@@ -40,16 +43,27 @@ function LoginPage() {
   const { redirect } = Route.useSearch();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm<Form>({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<Form>({
     resolver: zodResolver(loginSchema),
   });
 
   const onSubmit = async (v: Form) => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email: v.email.trim().toLowerCase(), password: v.password });
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: v.email.trim().toLowerCase(),
+      password: v.password,
+    });
     if (error) return void toast.error(friendlyError(error));
     const role = await fetchRole(data.user.id);
     if (!role) return void toast.error("This account has no role assigned.");
-    const target = redirect && redirect.startsWith(`/${role === "receptionist" ? "reception" : role}`) ? redirect : ROLE_HOME[role];
+    const target =
+      redirect && redirect.startsWith(`/${role === "receptionist" ? "reception" : role}`)
+        ? redirect
+        : ROLE_HOME[role];
     window.location.assign(target);
     void navigate;
   };
@@ -64,7 +78,12 @@ function LoginPage() {
         </div>
         <div>
           <Label htmlFor="password">Password</Label>
-          <Input id="password" type="password" autoComplete="current-password" {...register("password")} />
+          <Input
+            id="password"
+            type="password"
+            autoComplete="current-password"
+            {...register("password")}
+          />
           <FieldError msg={errors.password?.message} />
         </div>
         <Button type="submit" className="w-full" disabled={isSubmitting}>
@@ -72,36 +91,60 @@ function LoginPage() {
         </Button>
       </form>
       <p className="mt-4 text-center text-sm text-muted-foreground">
-        New patient? <Link to="/register" className="font-semibold text-primary">Create an account</Link>
+        New patient?{" "}
+        <Link to="/register" className="font-semibold text-primary">
+          Create an account
+        </Link>
       </p>
       {SHOW_DEMO_CREDENTIALS && (
         <div className="mt-6 rounded-xl border bg-muted/50">
-          <Button variant="ghost" type="button" onClick={() => setOpen((o) => !o)} className="h-auto w-full justify-between px-4 py-3 text-sm font-semibold text-foreground">
-            <span>Demo accounts <span className="ml-1 text-xs font-normal text-muted-foreground">(Staff)</span></span>
+          <Button
+            variant="ghost"
+            type="button"
+            onClick={() => setOpen((o) => !o)}
+            className="h-auto w-full justify-between px-4 py-3 text-sm font-semibold text-foreground"
+          >
+            <span>
+              Demo accounts{" "}
+              <span className="ml-1 text-xs font-normal text-muted-foreground">(Staff)</span>
+            </span>
             <ChevronDown className={`size-4 transition-transform ${open ? "rotate-180" : ""}`} />
           </Button>
           {open && (
             <div className="space-y-1.5 px-3 pb-3">
               <p className="px-1 pb-1 text-xs text-muted-foreground">
-                Password for all staff: <code className="rounded bg-background px-1.5 py-0.5 font-semibold text-foreground border">{DEMO_PASSWORD}</code>
+                Password for all staff:{" "}
+                <code className="rounded bg-background px-1.5 py-0.5 font-semibold text-foreground border">
+                  {DEMO_PASSWORD}
+                </code>
               </p>
               {DEMO_ACCOUNTS.map((a) => (
                 <Button
                   variant="ghost"
                   key={a.email}
                   type="button"
-                  onClick={() => { setValue("email", a.email); setValue("password", DEMO_PASSWORD); }}
+                  onClick={() => {
+                    setValue("email", a.email);
+                    setValue("password", DEMO_PASSWORD);
+                  }}
                   className="h-auto w-full items-center justify-between rounded-md border border-transparent px-2.5 py-2 text-left text-sm hover:border-border hover:bg-card"
                 >
                   <span className="font-medium text-foreground">{a.name}</span>
-                  <Badge variant={a.role === "Doctor" ? "default" : "secondary"} className="text-[11px] font-normal">
+                  <Badge
+                    variant={a.role === "Doctor" ? "default" : "secondary"}
+                    className="text-[11px] font-normal"
+                  >
                     {a.role}
                   </Badge>
                 </Button>
               ))}
               <div className="mt-2 rounded-lg border border-dashed border-border/80 bg-background/60 p-2.5 text-xs text-muted-foreground">
-                <span className="font-semibold text-foreground">Patients:</span> No demo logins — patients must{" "}
-                <Link to="/register" className="font-semibold text-primary underline underline-offset-2">
+                <span className="font-semibold text-foreground">Patients:</span> No demo logins —
+                patients must{" "}
+                <Link
+                  to="/register"
+                  className="font-semibold text-primary underline underline-offset-2"
+                >
                   create an account
                 </Link>{" "}
                 to book & track appointments.

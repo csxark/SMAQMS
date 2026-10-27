@@ -7,7 +7,12 @@ export const nameSchema = z
   .max(100, "At most 100 characters")
   .regex(/^[A-Za-z .'-]+$/, "Letters, spaces and . ' - only");
 
-export const emailSchema = z.string().trim().max(254).email("Enter a valid email").transform((v) => v.toLowerCase());
+export const emailSchema = z
+  .string()
+  .trim()
+  .max(254)
+  .email("Enter a valid email")
+  .transform((v) => v.toLowerCase());
 
 export const phoneSchema = z
   .string()
@@ -21,10 +26,19 @@ export const passwordSchema = z
   .regex(/[A-Za-z]/, "Include a letter")
   .regex(/[0-9]/, "Include a digit");
 
-export const loginSchema = z.object({ email: emailSchema, password: z.string().min(1, "Required") });
+export const loginSchema = z.object({
+  email: emailSchema,
+  password: z.string().min(1, "Required"),
+});
 
 export const registerSchema = z
-  .object({ name: nameSchema, email: emailSchema, phone: phoneSchema, password: passwordSchema, confirm: z.string() })
+  .object({
+    name: nameSchema,
+    email: emailSchema,
+    phone: phoneSchema,
+    password: passwordSchema,
+    confirm: z.string(),
+  })
   .refine((v) => v.password === v.confirm, { path: ["confirm"], message: "Passwords don't match" });
 
 export const walkInSchema = z.object({

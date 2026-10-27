@@ -28,9 +28,16 @@ export function useAsync<T>(fn: () => Promise<T>, deps: unknown[]) {
 }
 
 type Table = "appointments" | "queue_entries" | "consultations";
-type Change = { table: Table; eventType: string; new: Record<string, unknown>; old: Record<string, unknown> };
+type Change = {
+  table: Table;
+  eventType: string;
+  new: Record<string, unknown>;
+  old: Record<string, unknown>;
+};
 
-/** Subscribes to realtime changes and polls while visible as a fallback. */
+/** Subscribes to realtime changes and polls as a fallback.
+ *  Also fires immediately when the tab becomes visible so switching
+ *  between role windows always shows fresh data. */
 export function useRealtime(tables: Table[], onChange: (c: Change | null) => void) {
   const cb = useRef(onChange);
   cb.current = onChange;
@@ -48,11 +55,21 @@ export function useRealtime(tables: Table[], onChange: (c: Change | null) => voi
       );
     }
     channel.subscribe();
+
+    // Periodic fallback poll (WebSocket may be unavailable with sb_publishable_ keys).
     const id = window.setInterval(() => {
       if (document.visibilityState === "visible") cb.current(null);
     }, REALTIME_FALLBACK_POLL_MS);
+
+    // Immediately re-fetch when the user switches back to this tab.
+    const onVisible = () => {
+      if (document.visibilityState === "visible") cb.current(null);
+    };
+    document.addEventListener("visibilitychange", onVisible);
+
     return () => {
       window.clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisible);
       void supabase.removeChannel(channel);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

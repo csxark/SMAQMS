@@ -14,9 +14,27 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/patient/book")({
   validateSearch: (s: Record<string, unknown>) => ({
-    doctorId: s["doctorId"] !== undefined && Number.isFinite(Number(s["doctorId"])) ? Number(s["doctorId"]) : undefined,
+    doctorId:
+      s["doctorId"] !== undefined && Number.isFinite(Number(s["doctorId"]))
+        ? Number(s["doctorId"])
+        : undefined,
   }),
-  head: () => ({ meta: [{"title": "Book appointment — SMAQMS"}, {"name": "description", "content": "Choose your doctor, appointment date and available consultation time."}, {"property": "og:title", "content": "Book appointment — SMAQMS"}, {"property": "og:description", "content": "Choose your doctor, appointment date and available consultation time."}, {"property": "og:type", "content": "website"}, {"name": "twitter:card", "content": "summary"}] }),
+  head: () => ({
+    meta: [
+      { title: "Book appointment — SMAQMS" },
+      {
+        name: "description",
+        content: "Choose your doctor, appointment date and available consultation time.",
+      },
+      { property: "og:title", content: "Book appointment — SMAQMS" },
+      {
+        property: "og:description",
+        content: "Choose your doctor, appointment date and available consultation time.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: BookingWizard,
 });
 
@@ -56,7 +74,14 @@ function BookingWizard() {
         {STEPS.map((s, i) => (
           <li key={s} className="flex flex-col gap-1.5">
             <span className={cn("h-1.5 rounded-full", i <= step ? "bg-primary" : "bg-muted")} />
-            <span className={cn("text-xs font-medium", i === step ? "text-foreground" : "text-muted-foreground")}>{s}</span>
+            <span
+              className={cn(
+                "text-xs font-medium",
+                i === step ? "text-foreground" : "text-muted-foreground",
+              )}
+            >
+              {s}
+            </span>
           </li>
         ))}
       </ol>
@@ -65,11 +90,21 @@ function BookingWizard() {
         {(list) => (
           <>
             {step === 0 && <SelectDoctor doctors={list} onPick={setPicked} />}
-            {step === 1 && doctor && <SelectDate doctor={doctor} onPick={setDate} onBack={() => setPicked(undefined)} />}
+            {step === 1 && doctor && (
+              <SelectDate doctor={doctor} onPick={setDate} onBack={() => setPicked(undefined)} />
+            )}
             {step === 2 && doctor && date && (
               <SelectTime
-                doctor={doctor} date={date} time={time} setTime={setTime} busy={busy}
-                onBack={() => { setDate(null); setTime(null); }} onConfirm={confirm}
+                doctor={doctor}
+                date={date}
+                time={time}
+                setTime={setTime}
+                busy={busy}
+                onBack={() => {
+                  setDate(null);
+                  setTime(null);
+                }}
+                onConfirm={confirm}
               />
             )}
             {step === 3 && doctor && date && time && (
@@ -83,8 +118,21 @@ function BookingWizard() {
                   <Row k="Time" v={formatTime(time)} />
                 </dl>
                 <div className="mt-6 flex gap-2">
-                  <Button variant="outline" className="flex-1" onClick={() => { setDone(false); setDate(null); setTime(null); setPicked(undefined); }}>Book another</Button>
-                  <Button className="flex-1" asChild><Link to="/patient/appointments">My appointments</Link></Button>
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => {
+                      setDone(false);
+                      setDate(null);
+                      setTime(null);
+                      setPicked(undefined);
+                    }}
+                  >
+                    Book another
+                  </Button>
+                  <Button className="flex-1" asChild>
+                    <Link to="/patient/appointments">My appointments</Link>
+                  </Button>
                 </div>
               </div>
             )}
@@ -108,7 +156,11 @@ function SelectDoctor({ doctors, onPick }: { doctors: Doctor[]; onPick: (id: num
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {doctors.map((d) => (
-        <button key={d.doctorId} onClick={() => onPick(d.doctorId)} className="rounded-2xl border bg-card p-5 text-left transition hover:border-primary hover:shadow-soft">
+        <button
+          key={d.doctorId}
+          onClick={() => onPick(d.doctorId)}
+          className="rounded-2xl border bg-card p-5 text-left transition hover:border-primary hover:shadow-soft"
+        >
           <p className="font-semibold text-foreground">{d.name}</p>
           <p className="text-sm text-muted-foreground">{d.specialization}</p>
         </button>
@@ -117,19 +169,31 @@ function SelectDoctor({ doctors, onPick }: { doctors: Doctor[]; onPick: (id: num
   );
 }
 
-function SelectDate({ doctor, onPick, onBack }: { doctor: Doctor; onPick: (d: string) => void; onBack: () => void }) {
+function SelectDate({
+  doctor,
+  onPick,
+  onBack,
+}: {
+  doctor: Doctor;
+  onPick: (d: string) => void;
+  onBack: () => void;
+}) {
   const today = clinicToday();
   const openDays = new Set(doctor.availability.map((a) => a.dayOfWeek));
   const dates = Array.from({ length: BOOKING_WINDOW_DAYS + 1 }, (_, i) => addDays(today, i));
   return (
     <div>
-      <p className="mb-4 text-sm text-muted-foreground">With <span className="font-semibold text-foreground">{doctor.name}</span></p>
+      <p className="mb-4 text-sm text-muted-foreground">
+        With <span className="font-semibold text-foreground">{doctor.name}</span>
+      </p>
       <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-7">
         {dates.map((d) => {
           const open = openDays.has(dayOfWeek(d));
           return (
             <button
-              key={d} disabled={!open} onClick={() => onPick(d)}
+              key={d}
+              disabled={!open}
+              onClick={() => onPick(d)}
               className="rounded-xl border bg-card px-2 py-3 text-center text-sm transition hover:border-primary disabled:cursor-not-allowed disabled:opacity-40"
             >
               {formatDate(d).split(",").slice(0, 2).join(",")}
@@ -137,30 +201,50 @@ function SelectDate({ doctor, onPick, onBack }: { doctor: Doctor; onPick: (d: st
           );
         })}
       </div>
-      <Button variant="ghost" className="mt-4" onClick={onBack}>← Change doctor</Button>
+      <Button variant="ghost" className="mt-4" onClick={onBack}>
+        ← Change doctor
+      </Button>
     </div>
   );
 }
 
 function SelectTime(p: {
-  doctor: Doctor; date: string; time: string | null; setTime: (t: string) => void;
-  busy: boolean; onBack: () => void; onConfirm: () => void;
+  doctor: Doctor;
+  date: string;
+  time: string | null;
+  setTime: (t: string) => void;
+  busy: boolean;
+  onBack: () => void;
+  onConfirm: () => void;
 }) {
-  const slots = useAsync(() => getAvailableSlots(p.doctor.doctorId, p.date), [p.doctor.doctorId, p.date]);
+  const slots = useAsync(
+    () => getAvailableSlots(p.doctor.doctorId, p.date),
+    [p.doctor.doctorId, p.date],
+  );
   return (
     <div>
       <p className="mb-4 text-sm text-muted-foreground">
-        {p.doctor.name} · <span className="font-semibold text-foreground">{formatDate(p.date)}</span>
+        {p.doctor.name} ·{" "}
+        <span className="font-semibold text-foreground">{formatDate(p.date)}</span>
       </p>
-      {slots.loading && !slots.data ? <ListSkeleton rows={2} /> : slots.error ? <ErrorState message={slots.error} onRetry={() => slots.reload()} /> :
-        slots.data && slots.data.filter((s) => s.available).length === 0 ? <EmptyState title="No open slots this day" hint="Pick another date." /> : (
+      {slots.loading && !slots.data ? (
+        <ListSkeleton rows={2} />
+      ) : slots.error ? (
+        <ErrorState message={slots.error} onRetry={() => slots.reload()} />
+      ) : slots.data && slots.data.filter((s) => s.available).length === 0 ? (
+        <EmptyState title="No open slots this day" hint="Pick another date." />
+      ) : (
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
           {(slots.data ?? []).map((s) => (
             <button
-              key={s.time} disabled={!s.available} onClick={() => p.setTime(s.time)}
+              key={s.time}
+              disabled={!s.available}
+              onClick={() => p.setTime(s.time)}
               className={cn(
                 "rounded-xl border px-2 py-2.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-35",
-                p.time === s.time ? "border-primary bg-primary text-primary-foreground" : "bg-card hover:border-primary",
+                p.time === s.time
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "bg-card hover:border-primary",
               )}
             >
               {formatTime(s.time)}
@@ -169,7 +253,9 @@ function SelectTime(p: {
         </div>
       )}
       <div className="mt-6 flex gap-2">
-        <Button variant="ghost" onClick={p.onBack}>← Change date</Button>
+        <Button variant="ghost" onClick={p.onBack}>
+          ← Change date
+        </Button>
         <Button className="ml-auto" disabled={!p.time || p.busy} onClick={p.onConfirm}>
           {p.busy ? "Booking…" : "Confirm appointment"}
         </Button>

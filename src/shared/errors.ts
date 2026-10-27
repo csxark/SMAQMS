@@ -24,6 +24,8 @@ export function friendlyError(e: unknown): string {
   if (match) return FRIENDLY[match[1] ?? ""] ?? match[2] ?? msg;
   if (/Invalid login credentials/i.test(msg)) return "Incorrect email or password.";
   if (/already registered/i.test(msg)) return "An account with this email already exists.";
+  if (/email not confirmed/i.test(msg))
+    return "Email not confirmed. Please run the SQL auto-confirm script or disable email confirmation in Supabase.";
   if (/rate limit|too many requests|over_email_send_rate_limit/i.test(msg))
     return "Too many requests. Please wait a moment and try again.";
   return msg || "Something went wrong.";

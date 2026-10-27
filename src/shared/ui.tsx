@@ -18,20 +18,39 @@ const TONE: Record<AnyStatus, string> = {
   in_progress: "bg-primary/15 text-primary",
 };
 const LABEL: Record<AnyStatus, string> = {
-  booked: "Booked", confirmed: "Confirmed", checked_in: "Checked in", completed: "Completed",
-  cancelled: "Cancelled", checkin_requested: "Check-in requested", waiting: "Waiting",
-  in_consultation: "In consultation", in_progress: "In progress",
+  booked: "Booked",
+  confirmed: "Confirmed",
+  checked_in: "Checked in",
+  completed: "Completed",
+  cancelled: "Cancelled",
+  checkin_requested: "Check-in requested",
+  waiting: "Waiting",
+  in_consultation: "In consultation",
+  in_progress: "In progress",
 };
 
 export function StatusBadge({ status }: { status: AnyStatus }) {
   return (
-    <span className={cn("inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold", TONE[status])}>
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold",
+        TONE[status],
+      )}
+    >
       {LABEL[status]}
     </span>
   );
 }
 
-export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: ReactNode }) {
+export function PageHeader({
+  title,
+  subtitle,
+  action,
+}: {
+  title: string;
+  subtitle?: string;
+  action?: ReactNode;
+}) {
   return (
     <div className="mb-8 flex flex-wrap items-end justify-between gap-3 border-b pb-6">
       <div>
@@ -53,10 +72,20 @@ export function ListSkeleton({ rows = 3 }: { rows?: number }) {
   );
 }
 
-export function EmptyState({ title, hint, action }: { title: string; hint?: string; action?: ReactNode }) {
+export function EmptyState({
+  title,
+  hint,
+  action,
+}: {
+  title: string;
+  hint?: string;
+  action?: ReactNode;
+}) {
   return (
     <div className="flex flex-col items-center border-y bg-muted/30 px-6 py-16 text-center">
-      <span className="mb-4 grid size-12 place-items-center rounded-full bg-muted"><Inbox className="size-5 text-muted-foreground" /></span>
+      <span className="mb-4 grid size-12 place-items-center rounded-full bg-muted">
+        <Inbox className="size-5 text-muted-foreground" />
+      </span>
       <p className="font-semibold text-foreground">{title}</p>
       {hint && <p className="mt-1 max-w-sm text-sm text-muted-foreground">{hint}</p>}
       {action && <div className="mt-4">{action}</div>}
@@ -78,7 +107,10 @@ export function ErrorState({ message, onRetry }: { message: string; onRetry: () 
 
 /** Renders loading / error / empty / content consistently. */
 export function AsyncView<T>({
-  state, empty, isEmpty, children,
+  state,
+  empty,
+  isEmpty,
+  children,
 }: {
   state: { data: T | null; error: string | null; loading: boolean; reload: () => void };
   empty: ReactNode;
@@ -86,7 +118,8 @@ export function AsyncView<T>({
   children: (d: T) => ReactNode;
 }) {
   if (state.loading && state.data === null) return <ListSkeleton />;
-  if (state.error && state.data === null) return <ErrorState message={state.error} onRetry={() => state.reload()} />;
+  if (state.error && state.data === null)
+    return <ErrorState message={state.error} onRetry={() => state.reload()} />;
   if (state.data === null) return <ListSkeleton />;
   if (isEmpty?.(state.data)) return <>{empty}</>;
   return <>{children(state.data)}</>;

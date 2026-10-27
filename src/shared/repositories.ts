@@ -20,7 +20,9 @@ export async function listDoctors() {
   const rows = ok(
     await supabase
       .from("doctors")
-      .select("doctor_id, name, specialization, slot_minutes, doctor_availability(day_of_week, start_time, end_time)")
+      .select(
+        "doctor_id, name, specialization, slot_minutes, doctor_availability(day_of_week, start_time, end_time)",
+      )
       .order("name"),
   );
   return rows.map((d) => ({
@@ -43,16 +45,24 @@ export async function getDoctor(id: number) {
 }
 
 export async function getAvailableSlots(doctorId: number, date: string) {
-  const rows = ok(await supabase.rpc("get_available_slots", { p_doctor_id: doctorId, p_date: date }));
+  const rows = ok(
+    await supabase.rpc("get_available_slots", { p_doctor_id: doctorId, p_date: date }),
+  );
   return rows.map((r) => ({ time: t(r.slot_time), available: r.is_available }));
 }
 
 /* Appointments */
-const APPT = "appointment_id, appointment_date, appointment_time, status, patient_id, doctor_id, doctors(name, specialization), patients(name, phone)";
+const APPT =
+  "appointment_id, appointment_date, appointment_time, status, patient_id, doctor_id, doctors(name, specialization), patients(name, phone)";
 function mapAppt(a: {
-  appointment_id: number; appointment_date: string; appointment_time: string; status: AppointmentStatus;
-  patient_id: number; doctor_id: number;
-  doctors: { name: string; specialization: string } | null; patients: { name: string; phone: string } | null;
+  appointment_id: number;
+  appointment_date: string;
+  appointment_time: string;
+  status: AppointmentStatus;
+  patient_id: number;
+  doctor_id: number;
+  doctors: { name: string; specialization: string } | null;
+  patients: { name: string; phone: string } | null;
 }) {
   return {
     appointmentId: a.appointment_id,
@@ -72,8 +82,12 @@ export type Appointment = ReturnType<typeof mapAppt>;
 export async function myAppointments() {
   const pid = ok(await supabase.rpc("current_patient_id"));
   const rows = ok(
-    await supabase.from("appointments").select(APPT).eq("patient_id", pid)
-      .order("appointment_date", { ascending: false }).order("appointment_time", { ascending: false }),
+    await supabase
+      .from("appointments")
+      .select(APPT)
+      .eq("patient_id", pid)
+      .order("appointment_date", { ascending: false })
+      .order("appointment_time", { ascending: false }),
   );
   return rows.map(mapAppt);
 }
@@ -88,11 +102,24 @@ export async function todaysAppointments(status?: AppointmentStatus) {
 const QUEUE =
   "queue_id, patient_id, doctor_id, appointment_id, queue_date, queue_position, status, verified, queued_at, created_at, doctors(name), patients(name, phone), appointments(appointment_time), consultations(consultation_id, status, verified_at)";
 function mapQueue(q: {
-  queue_id: number; patient_id: number; doctor_id: number; appointment_id: number | null; queue_date: string;
-  queue_position: number | null; status: QueueStatus; verified: boolean; queued_at: string | null; created_at: string;
-  doctors: { name: string } | null; patients: { name: string; phone: string } | null;
+  queue_id: number;
+  patient_id: number;
+  doctor_id: number;
+  appointment_id: number | null;
+  queue_date: string;
+  queue_position: number | null;
+  status: QueueStatus;
+  verified: boolean;
+  queued_at: string | null;
+  created_at: string;
+  doctors: { name: string } | null;
+  patients: { name: string; phone: string } | null;
   appointments: { appointment_time: string } | null;
-  consultations: { consultation_id: number; status: ConsultationStatus; verified_at: string | null } | null;
+  consultations: {
+    consultation_id: number;
+    status: ConsultationStatus;
+    verified_at: string | null;
+  } | null;
 }) {
   return {
     queueId: q.queue_id,
@@ -109,7 +136,11 @@ function mapQueue(q: {
     patientPhone: q.patients?.phone ?? "",
     appointmentTime: q.appointments ? t(q.appointments.appointment_time) : null,
     consultation: q.consultations
-      ? { id: q.consultations.consultation_id, status: q.consultations.status, verifiedAt: q.consultations.verified_at }
+      ? {
+          id: q.consultations.consultation_id,
+          status: q.consultations.status,
+          verifiedAt: q.consultations.verified_at,
+        }
       : null,
   };
 }
@@ -117,8 +148,12 @@ export type QueueEntry = ReturnType<typeof mapQueue>;
 
 export async function todaysQueue() {
   const rows = ok(
-    await supabase.from("queue_entries").select(QUEUE).eq("queue_date", clinicToday())
-      .order("queue_position", { ascending: true, nullsFirst: false }).order("created_at"),
+    await supabase
+      .from("queue_entries")
+      .select(QUEUE)
+      .eq("queue_date", clinicToday())
+      .order("queue_position", { ascending: true, nullsFirst: false })
+      .order("created_at"),
   );
   return rows.map(mapQueue);
 }
@@ -126,7 +161,11 @@ export async function todaysQueue() {
 export async function myTodayQueue() {
   const pid = ok(await supabase.rpc("current_patient_id"));
   const rows = ok(
-    await supabase.from("queue_entries").select(QUEUE).eq("patient_id", pid).eq("queue_date", clinicToday())
+    await supabase
+      .from("queue_entries")
+      .select(QUEUE)
+      .eq("patient_id", pid)
+      .eq("queue_date", clinicToday())
       .order("created_at", { ascending: false }),
   );
   return rows.map(mapQueue);
@@ -136,9 +175,18 @@ export async function myTodayQueue() {
 const CONS =
   "consultation_id, queue_id, appointment_id, patient_id, doctor_id, consultation_date, status, notes, prescription, verified_at, doctors(name, specialization), patients(name, phone, email)";
 function mapCons(c: {
-  consultation_id: number; queue_id: number; appointment_id: number | null; patient_id: number; doctor_id: number;
-  consultation_date: string; status: ConsultationStatus; notes: string; prescription: string; verified_at: string | null;
-  doctors: { name: string; specialization: string } | null; patients: { name: string; phone: string; email: string | null } | null;
+  consultation_id: number;
+  queue_id: number;
+  appointment_id: number | null;
+  patient_id: number;
+  doctor_id: number;
+  consultation_date: string;
+  status: ConsultationStatus;
+  notes: string;
+  prescription: string;
+  verified_at: string | null;
+  doctors: { name: string; specialization: string } | null;
+  patients: { name: string; phone: string; email: string | null } | null;
 }) {
   return {
     consultationId: c.consultation_id,
@@ -161,19 +209,33 @@ function mapCons(c: {
 export type Consultation = ReturnType<typeof mapCons>;
 
 export async function getConsultation(id: number) {
-  const r = await supabase.from("consultations").select(CONS).eq("consultation_id", id).maybeSingle();
+  const r = await supabase
+    .from("consultations")
+    .select(CONS)
+    .eq("consultation_id", id)
+    .maybeSingle();
   if (r.error) throw new Error(r.error.message);
   return r.data ? mapCons(r.data) : null;
 }
 
 export async function getConsultationByAppointment(appointmentId: number) {
-  const r = await supabase.from("consultations").select("consultation_id, verified_at").eq("appointment_id", appointmentId).maybeSingle();
+  const r = await supabase
+    .from("consultations")
+    .select("consultation_id, verified_at")
+    .eq("appointment_id", appointmentId)
+    .maybeSingle();
   if (r.error) throw new Error(r.error.message);
   return r.data;
 }
 
 export async function listConsultations() {
-  const rows = ok(await supabase.from("consultations").select(CONS).order("created_at", { ascending: false }).limit(100));
+  const rows = ok(
+    await supabase
+      .from("consultations")
+      .select(CONS)
+      .order("created_at", { ascending: false })
+      .limit(100),
+  );
   return rows.map(mapCons);
 }
 

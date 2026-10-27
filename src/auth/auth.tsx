@@ -36,11 +36,20 @@ export async function requireRole(role: AppRole, href: string) {
 
 type AuthState = { session: Session | null; role: AppRole | null; name: string; loading: boolean };
 const AuthCtx = createContext<AuthState & { signOut: () => Promise<void> }>({
-  session: null, role: null, name: "", loading: true, signOut: async () => {},
+  session: null,
+  role: null,
+  name: "",
+  loading: true,
+  signOut: async () => {},
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AuthState>({ session: null, role: null, name: "", loading: true });
+  const [state, setState] = useState<AuthState>({
+    session: null,
+    role: null,
+    name: "",
+    loading: true,
+  });
 
   useEffect(() => {
     const load = async (session: Session | null) => {
@@ -59,7 +68,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthCtx.Provider value={{ ...state, signOut: async () => { await supabase.auth.signOut(); } }}>
+    <AuthCtx.Provider
+      value={{
+        ...state,
+        signOut: async () => {
+          await supabase.auth.signOut();
+        },
+      }}
+    >
       {children}
     </AuthCtx.Provider>
   );
